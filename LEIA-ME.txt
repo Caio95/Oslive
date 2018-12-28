@@ -1,0 +1,15 @@
+Para a instalação das dependencias do simulador de escalonamento de processos
+Oslive faça os seguintes procedimentos:
+
+1- Instale o NodeJS;
+
+2- Execute o comando 'npm install' (sem aspas) na pasta raiz do sistema
+(No mesmo local onde localiza o arquivo "package.json") para criar a pasta
+"node_modules" (Pasta que contém as bibliotecas utilizadas pelo sistema);
+
+3- Execute em algum servidor de aplicação web ou execute apenas o arquivo
+ "index.html".
+
+
+Desenvolvido por Caio Henrique de Sousa
+Ciência da Computação - CEULP/ULBRA

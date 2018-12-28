@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-br" ng-app="oslive">
+<head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE-edge">
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="app.css">
+		<script data-require="angular.js@1.6.1" data-semver="1.6.1" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular.js"></script>
+    	<script data-require="angular-animate@1.6.0" data-semver="1.6.0" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.0/angular-animate.js"></script>
+        <script type="text/javascript" src="loader.js"></script>
+        <script src="node_modules/jquery/dist/jquery.min.js"></script>
+        <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="node_modules/angular/angular.min.js"></script>
+        <script src="node_modules/angular-route/angular-route.min.js"></script>
+        <script src="node_modules/angular-resource/angular-resource.min.js"></script>
+        <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <script type="text/javascript" src="app.js"></script>
+        <script type="text/javascript" src="Algoritimos/processo.js"></script>
+        <script type="text/javascript" src="Algoritimos/cpu.js"></script>
+        <script type="text/javascript" src="Algoritimos/pc.js"></script>
+        <script type="text/javascript" src="graficos.js"></script>
+        <script type="text/javascript" src="notify.js"></script>
+        <script type="text/javascript" src="Algoritimos/escalona_fifo.js"></script>
+        <script type="text/javascript" src="Algoritimos/escalona_sjf.js"></script>
+        <script type="text/javascript" src="Algoritimos/escalona_prio.js"></script>
+        <script type="text/javascript" src="Algoritimos/escalona_prio_premp.js"></script>
+		<link rel="icon" type="image/jpg" href="computer.png" /> <!-- icone do titulo -->
+<title>OSlive</title>
+</head>
+<body ng-controller="homeController">
+ 					<div class="nav-side-menu">  						<!-- barra de navegacao vertical -->
+					    <div class="brand"><b style="font-size: 25px">OS</b>live</div>
+
+					    <i class="fa fa-bars fa-2x toggle-btn" data-toggle="collapse" data-target="#menu-content"></i>
+					        <div class="menu-list">
+					  
+					            <ul id="menu-content" class="menu-content collapse out">
+
+					                <li  data-toggle="collapse" data-target="#config" class="collapsed active">
+					                  <a href="#"><i class="glyphicon glyphicon-cog"></i> <b style="font-size: 17px">Á</b>rea de <b style="font-size: 17px">C</b>onfiguração <span class="arrow"></span></a>
+					                </li>
+					                <ul class="sub-menu collapse" id="config">
+
+						                <li data-toggle="collapse" data-target="#algoritmo" class="collapsed active"><b style="font-size: 15px">S</b>elecionar <b style="font-size: 15px">A</b>lgoritmo de <b style="font-size: 15px">E</b>scalonamento</li>
+						                 <ul class="sub-menu collapse" id="algoritmo">
+											  <select class="form-control" id="selectAlgoritmo" ng-model="escalonador">
+												    <option value="FIFO">FIFO (First In, First Out)</option>
+												    <option value="SJF">SJF (Shortest Job First)</option>
+												    <option value="PrioNP">Prioridade (Não Preemptiva)</option>
+												    <option value="PrioP">Prioridade (Preemptiva)</option>
+												    <option value="RR">RR (Round Robin)</option>
+											  </select>	                 	
+						                 </ul>
+
+						                  <li data-toggle="collapse" data-target="#add" class="collapsed active"><b style="font-size: 15px">A</b>dicionar <b style="font-size: 15px">P</b>rocessos</li> <!--  Cadastrar Processos -->
+
+						                  <ul class="sub-menu collapse" id="add">
+							                  <form class="form-group">
+							          				<div>
+								                  		<input type="text" id="processo" class="form-control" ng-model="processo.nome" placeholder="Nome do Processo" maxlength="1" size="2">
+							          				</div>
+							          				<div>
+							          					<input type="number" id="chegada" min="0" class="form-control" ng-model="processo.chegada" placeholder="Tempo de Chegada">
+							          				</div>
+							          				<div>
+							          					<input type="number" id="execucao" min="0" class="form-control" ng-model="processo.execucao" placeholder="Tempo de Execução">
+							          				</div>
+							          				<div>
+							          					<input type="number" id="prioridade" min="0" class="form-control" ng-model="processo.prioridade" placeholder="Prioridade">
+							          				</div>
+							          				<div id="botoes" align="center">
+										                <button class="btn btn-control" id="btnCad" ng-click="cadastrar(processo)"><i class="glyphicon glyphicon-plus-sign"></i> Cadastrar</button>
+									                	<button class="btn btn-control" id="btnCan" ng-click="cancelar()"><i class="glyphicon glyphicon-remove-sign"></i> Cancelar</button>
+							          				</div>
+							                  </form>	                  	
+						                  </ul>
+
+						              	  <li data-toggle="collapse" data-target="#tabela" class="collapsed active"><b style="font-size: 15px">T</b>abela de <b style="font-size: 15px">P</b>rocessos</li> <!-- Listar processos na tabela -->
+						              	  		<ul class="sub-menu collapse" id="tabela">
+								              	  		<table class="table table-borded" id="tabelaProcesso">
+								              	  			<tr>
+								              	  				<td>Processo</td>
+								              	  				<td>T Chegada</td>
+								              	  				<td>T Execução</td>
+								              	  				<td>Prioridade</td>
+								              	  				<td>Ação</td>
+								              	  			</tr>
+								              	  			<tr ng-repeat="processo in processos">
+								              	  				<td>{{processo.nome}}</td>
+								              	  				<td>{{processo.chegada}}</td>
+								              	  				<td>{{processo.execucao}}</td>
+								              	  				<td>{{processo.prioridade}}</td>
+								                                <td>
+								                                    <button type="button" class="btn btn-danger btn-xs" ng-click="excluir($index)">
+								                                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+								                                    </button>
+								                                    <button type="button" class="btn btn-default btn-xs" ng-click="editar(processo)">
+								                                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+								                                    </button>
+					                                			</td>
+								              	  			</tr>
+								              	  		</table>	              	  			
+						              	  		</ul>
+					                </ul>
+
+					                <li data-toggle="collapse" data-target="#parametro" class="collapsed">
+					                  <a href="#"><i class="fa fa-globe fa-lg"></i> <b style="font-size: 17px">C</b>onfigurações <b style="font-size: 17px">G</b>lobais <span class="arrow"></span></a>
+					                </li>  
+					                <ul class="sub-menu collapse" id="parametro">
+					                  	<li data-toggle="collapse" data-target="#opcoes" class="collapsed active"><b style="font-size: 15px">Q</b>uantum</li>
+					          				<ul class="sub-menu collapse" id="opcoes">
+						          				<div>
+							                  		<input type="number" id="quantum" min="0" ng-model="quantum" class="form-control" placeholder="Fatia de Tempo">
+						          				</div>
+<!-- 						          			<div>
+							                  		<input type="number" id="cpus" class="form-control" placeholder="Quantidade de CPUs">
+						          				</div> -->
+					          				</ul>
+					                </ul>
+
+
+					                 <li data-toggle="collapse" data-target="#simular" class="collapsed">
+						                  <a href="#">
+						                  <i class="fa fa-dashboard fa-lg"></i> <b style="font-size: 17px">S</b>imular<span class="arrow">
+						                  </a>
+					                 </li>
+					                 <ul class="sub-menu collapse" id="simular">
+					                 	<div align="center">
+					                 		<b style="font-size: 17px">S</b>em <b style="font-size: 17px">A</b>nimação: <input type="checkbox" ng-model="n">
+					                 	</div>
+					                 		
+				          				<div id="botoes" align="center">
+							                <button class="btn btn-control" id="btnSimular" ng-click="simular()"><i class="glyphicon glyphicon-play"></i> Iniciar</button>
+<!-- 	Botao de pausar						<button class="btn btn-control" id="btnPauseSimu" ng-click="pausar_simulacao()"><i class="glyphicon glyphicon-pause"></i> Pausar</button> -->
+						                	<button class="btn btn-control" id="btnCanSimu" ng-click="cancel_simulacao()"><i class="glyphicon glyphicon-stop"></i> Cancelar</button> 
+				          				</div>	
+					                 </ul>
+					            </ul>
+					     </div>
+					</div> 	 <!-- fim da barra de menu vertical class="nav-side-menu"-->	
+										
+						<div class="row" align="center">
+						 		<div class="col-sm-9 col-sm-offset-1">
+				                    <h1><b style="font-size: 37px">CPU</b></h1>    
+				                    	<div class="table-responsive">
+					                    	<table class="table table-responsive" id="tabelaExec" border="2" ng-hide="n">  
+						                    		<tr align="center">
+						                    			<td style="font-size: 10px">Tempo</td><td ng-repeat="r in resultados" style="font-size: 10px">{{r.tempo}}</td>
+						                    		</tr>
+				                    				<tr align="center">
+						                    			<td style="font-size: 10px">Processo</td><td ng-repeat="p in resultados" style="-webkit-transition-delay:{{$index * 500}}ms; background-color:{{p.cor}}; color: #FFFFFF; font-size: 10px">{{p.nome}}</td>
+					                    			</tr>
+					                    	</table>
+					                    	<table class="table table-responsive" id="tabelaExec" border="2" ng-show="n">  
+						                    		<tr align="center">
+						                    			<td style="font-size: 10px">Tempo</td><td ng-repeat="r in resultados" style="font-size: 10px">{{r.tempo}}</td>
+						                    		</tr>
+				                    				<tr align="center">
+						                    			<td style="font-size: 10px">Processo</td><td ng-repeat="p in resultados" style=" background-color:{{p.cor}}; color: #FFFFFF; font-size: 10px">{{p.nome}}</td>
+					                    			</tr>
+					                    	</table>
+
+				                    	</div>
+						 		</div>					
+						</div>
+
+			        <div class="row" id="result">
+			        	<div align="center">
+							<h4><b style="font-size: 20px">T</b>abela <b style="font-size: 20px">R</b>esultado</h4>
+								<table class="table table-bordered">
+									<tr align="center">
+										<td>Processo</td>
+										<td>Tempo de Espera</td>
+										<td>Tempo Total (Turnaround)</td>
+									</tr>
+									<tr ng-repeat="resultado in resultados2" align="center">
+										<td>{{resultado.nome}}</td>
+										<td>{{resultado.espera}}</td>
+										<td>{{resultado.turn}}</td>
+									</tr>	
+								</table>
+			        	</div>
+			        </div>
+			        <div class="row" id="grafico">
+				        <div align="center">
+			        		<h4 align="center"><b style="font-size: 20px">R</b>esultado <b style="font-size: 20px">G</b>ráfico</h4>
+			        		<div>
+				        		<div id="chart_div" class></div>
+				        	</div>	        	
+				        </div>
+			        </div>
+			        <footer id="rodape">
+  						<b style="font-size: 9px">Desenvolvido por Caio Henrique de Sousa</b>
+					</footer> 
+</body>
+</html>
